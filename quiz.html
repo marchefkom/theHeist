@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Herr Becher's Köbes Exam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* one-screen quiz show: big question, four coloured answer tiles, timer bar, running score */
+  --bg: #13211b;
+  --panel: #1c2e26;
+  --ink: #f4f1ea;
+  --muted: #b7c2bb;
+  --copper: #d08a4e;
+  --a1: #c8323f; --a2: #2f63c8; --a3: #c99a12; --a4: #2f8f4e;
+  --good: #4fbf7a; --bad: #e0606b;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; }
+main { max-width: 900px; margin: 0 auto; padding: 24px 18px 40px; display: grid; gap: 18px; }
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.01em; }
+.brand span { color: var(--copper); }
+.stats { display: flex; gap: 10px; font-variant-numeric: tabular-nums; }
+.pill { background: var(--panel); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 14px; }
+.timer { height: 8px; background: var(--panel); border-radius: 99px; overflow: hidden; }
+.timer i { display: block; height: 100%; width: 100%; background: var(--copper); transform-origin: left; }
+.card { background: var(--panel); border-radius: 16px; padding: 28px 24px; min-height: 150px; display: grid; place-items: center; text-align: center; }
+.card h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(22px, 3.4vw, 32px); line-height: 1.2; margin: 0; text-wrap: balance; }
+.card .cat { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--copper); margin-bottom: 10px; font-weight: 600; }
+.answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.ans { border: 0; border-radius: 14px; padding: 20px 18px; min-height: 92px; color: #fff; font: 600 18px/1.3 var(--font-body); text-align: left; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: transform .08s, opacity .2s, filter .2s; }
+.ans:hover { filter: brightness(1.08); }
+.ans:active { transform: scale(.98); }
+.ans:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.ans .sh { width: 28px; height: 28px; flex: none; }
+.ans[data-i="0"] { background: var(--a1); } .ans[data-i="1"] { background: var(--a2); }
+.ans[data-i="2"] { background: var(--a3); } .ans[data-i="3"] { background: var(--a4); }
+.ans.dim { opacity: .28; }
+.ans.right { box-shadow: 0 0 0 4px var(--good); opacity: 1; }
+.feedback { background: var(--panel); border-radius: 14px; padding: 16px 18px; display: none; gap: 6px; }
+.feedback.show { display: grid; }
+.feedback b { font-family: var(--font-display); font-size: 20px; }
+.feedback b.ok { color: var(--good); } .feedback b.no { color: var(--bad); }
+.feedback p { margin: 0; color: var(--muted); line-height: 1.5; }
+.row { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.btn { border: 0; border-radius: 12px; background: var(--copper); color: #1a120b; font: 700 16px var(--font-body); padding: 12px 22px; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--muted); }
+.btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.intro, .end { background: var(--panel); border-radius: 16px; padding: 30px 26px; display: grid; gap: 14px; }
+.intro h1, .end h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 4.5vw, 42px); margin: 0; line-height: 1.1; text-wrap: balance; }
+.intro p, .end p { margin: 0; color: var(--muted); max-width: 62ch; line-height: 1.55; }
+.big { font-family: var(--font-display); font-weight: 800; font-size: 64px; color: var(--copper); font-variant-numeric: tabular-nums; line-height: 1; }
+.hidden { display: none !important; }
+@media (max-width: 560px) { .answers { grid-template-columns: 1fr; } .ans { min-height: 64px; } }
+@media (prefers-reduced-motion: reduce) { .timer i { transition: none !important; } .ans { transition: none; } }
+.preview { margin-top: 28px; font-size: 13px; color: var(--muted); }
+.preview a { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <a href="index.html#12" style="color:var(--muted);text-decoration:none;font-size:14px;display:block;margin-bottom:6px">← Back to the story</a><div class="brand" id="brand">Herr Becher's <span>K&ouml;bes Exam</span></div>
+    <div class="stats"><span class="pill" id="qcount">Question 0 / 0</span><span class="pill" id="score">0 points</span></div>
+  </div>
+
+  <section class="intro" id="intro">
+    <h1 id="ih">Only a real K&ouml;bes gets into the cellar.</h1>
+    <p id="ip">Herr Becher has watched K&ouml;bes at work since 1895, give or take. Before he hands over the blue apron, you answer his questions on Altbier, D&uuml;sseldorf and the enemy across the Rhine. 20 seconds per question. Fast and right earns the most points.</p>
+    <div class="row" style="justify-content:flex-start"><button class="btn" id="start">Start the exam</button></div>
+  </section>
+
+  <section id="game" class="hidden" aria-live="polite">
+    <div class="timer" aria-hidden="true"><i id="bar"></i></div>
+    <div class="card" style="margin-top:14px"><div><div class="cat" id="cat"></div><h2 id="q"></h2></div></div>
+    <div class="answers" id="answers" style="margin-top:14px"></div>
+    <div class="feedback" id="fb" style="margin-top:14px"><b id="fbt"></b><p id="fbx"></p></div>
+    <div class="row" style="margin-top:14px"><button class="btn hidden" id="next">Next question</button></div>
+  </section>
+
+  <section class="end hidden" id="end">
+    <h1 id="verdict"></h1>
+    <div class="big" id="final"></div>
+    <p id="endtext"></p>
+    <div class="row" style="justify-content:flex-start"><button class="btn" id="again">Take the exam again</button></div>
+  </section>
+  <p class="preview" id="preview">Preview for Kate: <a href="#" data-v="a">12A, Herr Becher's exam</a> · <a href="#" data-v="b">12B, Kalle's loyalty test</a></p>
+</main>
+
+<script>
+const Q = [
+  { c: "The Köbes", q: "What does a Köbes never ask?", a: ["“Noch eins?”", "“Zahlen, bitte?”", "“Alt oder Kölsch?”", "“Mit Senf?”"], r: 0, x: "He doesn't ask. He swaps your empty glass for a full one until you stop him." },
+  { c: "The Köbes", q: "What does each stroke on your beer coaster mean?", a: ["One minute at the table", "One beer", "One insult from the Köbes", "One euro tip"], r: 1, x: "One stroke per glass. You pay what the coaster says when you leave." },
+  { c: "The Köbes", q: "How do you make the Köbes stop bringing beer?", a: ["Say “Danke, genug”", "Raise your hand", "Put the coaster on top of your glass", "Turn your glass upside down"], r: 2, x: "Coaster on the glass. Everything else gets you another one." },
+  { c: "Altbier history", q: "Which Düsseldorf brewery pub, opened in 1838, is the oldest Altbier pub still running?", a: ["Füchschen", "Uerige", "Schlüssel", "Schumacher"], r: 3, x: "Matthias Schumacher opened it in 1838. Herr Becher started his career there." },
+  { c: "Düsseldorf Platt", q: "The brewery name “Uerige” means what in Düsseldorf dialect?", a: ["Grumpy", "Thirsty", "Old", "Copper-coloured"], r: 0, x: "Grumpy. Fitting, given its Köbes." },
+  { c: "Düsseldorf Platt", q: "What does “Sticke”, the stronger Altbier brewed only a few times a year, mean?", a: ["Strong", "Secret", "Sticky", "Small"], r: 1, x: "Secret. Uerige announces it the day before with a sign: “morje Sticke”." },
+  { c: "Düsseldorf Platt", q: "On the day the Sticke is finally served, the Uerige sign changes to…", a: ["“jetzt Sticke”", "“endlich Sticke”", "“hütt Sticke”", "“morje widder”"], r: 2, x: "“Hütt Sticke”: today, the secret. Remember that for 23 December." },
+  { c: "Christmas", q: "Which Düsseldorf brewery makes a Christmas beer that's served in the brewpub on Christmas Eve?", a: ["Schumacher", "Kürzer", "Füchschen", "Diebels"], r: 2, x: "Füchschen Weihnachtsbier, in bottles from mid-November." },
+  { c: "The Altstadt", q: "Düsseldorf's Altstadt is proudly called…", a: ["The longest bar in the world", "The thirstiest square mile", "Little Cologne", "The Rhine's living room"], r: 0, x: "“Die längste Theke der Welt.” Please never call it Little Cologne." },
+  { c: "Glassware", q: "How much does a Kölsch Stange, Herr Klein's body, usually hold?", a: ["0.1 l", "0.2 l", "0.3 l", "0.5 l"], r: 1, x: "0.2 litres. Which explains a lot about Herr Klein." },
+  { c: "Glassware", q: "And a classic Altbier glass in the Altstadt brewpubs?", a: ["0.2 l", "0.25 l", "0.33 l", "0.4 l"], r: 1, x: "0.25 litres. Herr Becher would like you to notice the difference." },
+  { c: "The enemy", q: "What is a Pittermännchen?", a: ["A Cologne carnival costume", "A Kölsch waiter's apron", "A small 10-litre Kölsch barrel", "A type of pretzel"], r: 2, x: "The little Kölsch barrel. Herr Klein keeps the stolen Christmas Spirit in one." },
+  { c: "Rhineland food", q: "In a Rhineland brewpub, what is a “Halve Hahn”?", a: ["Half a roast chicken", "A rye roll with a thick slice of cheese", "A half-litre of Alt", "A pork knuckle"], r: 1, x: "Rye roll, cheese, mustard. No chicken was ever involved." },
+  { c: "Fortuna", q: "In which year was Fortuna Düsseldorf founded?", a: ["1895", "1904", "1919", "1948"], r: 0, x: "1895, hence the F95." },
+  { c: "Fortuna", q: "When did Fortuna Düsseldorf win the German championship?", a: ["1933", "1954", "1979", "Every year, morally"], r: 0, x: "1933. The other answer is also accepted by Herr Becher." },
+  { c: "The password", q: "“Köbes, donn mech doch emol e lecker Alt!” means…", a: ["Waiter, the bill please!", "Waiter, go on, bring me a nice Alt!", "Waiter, is this Kölsch?", "Waiter, one more round for the table!"], r: 1, x: "The old password of Herr Becher's network. You're in." }
+];
+const SHAPES = [
+  '<svg class="sh" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 22 20H2z" fill="#fff"/></svg>',
+  '<svg class="sh" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 22 12 12 22 2 12z" fill="#fff"/></svg>',
+  '<svg class="sh" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff"/></svg>',
+  '<svg class="sh" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" fill="#fff"/></svg>'
+];
+const TIME = 20000;
+let i = 0, score = 0, correct = 0, t0 = 0, raf = 0, locked = false;
+const $ = id => document.getElementById(id);
+
+function show(id) { ["intro", "game", "end"].forEach(s => $(s).classList.toggle("hidden", s !== id)); }
+function stats() { $("qcount").textContent = "Question " + Math.min(i + 1, Q.length) + " / " + Q.length; $("score").textContent = score + " points"; }
+
+function ask() {
+  locked = false; stats();
+  const q = Q[i];
+  $("cat").textContent = q.c; $("q").textContent = q.q;
+  $("fb").classList.remove("show"); $("next").classList.add("hidden");
+  $("answers").innerHTML = q.a.map((t, k) => '<button class="ans" data-i="' + k + '" id="ans' + k + '">' + SHAPES[k] + '<span></span></button>').join("");
+  q.a.forEach((t, k) => { $("ans" + k).querySelector("span").textContent = t; $("ans" + k).onclick = () => pick(k); });
+  t0 = performance.now(); tick();
+}
+function tick() {
+  const left = Math.max(0, 1 - (performance.now() - t0) / TIME);
+  $("bar").style.transform = "scaleX(" + left + ")";
+  if (left <= 0) return pick(-1);
+  raf = requestAnimationFrame(tick);
+}
+function pick(k) {
+  if (locked) return; locked = true; cancelAnimationFrame(raf);
+  const q = Q[i], ok = k === q.r;
+  const elapsed = Math.min(TIME, performance.now() - t0);
+  const pts = ok ? Math.round(500 + 500 * (1 - elapsed / TIME)) : 0;
+  score += pts; if (ok) correct++;
+  document.querySelectorAll(".ans").forEach((b, n) => { b.disabled = true; b.classList.add(n === q.r ? "right" : "dim"); });
+  $("fbt").textContent = ok ? "Richtig! +" + pts : (k === -1 ? "Time's up." : "Nope.");
+  $("fbt").className = ok ? "ok" : "no";
+  $("fbx").textContent = q.x;
+  $("fb").classList.add("show");
+  $("next").textContent = i === Q.length - 1 ? "See the verdict" : "Next question";
+  $("next").classList.remove("hidden"); $("next").focus();
+  stats();
+}
+const V = {
+  a: {
+    brand: "Herr Becher's <span>K&ouml;bes Exam</span>",
+    ih: "Only a real K&ouml;bes gets into the cellar.",
+    ip: "Herr Becher has watched K&ouml;bes at work since 1895, give or take. Before he hands over the blue apron, you answer his questions on Altbier, D&uuml;sseldorf and the enemy across the Rhine. 20 seconds per question. Fast and right earns the most points.",
+    start: "Start the exam", again: "Take the exam again",
+    v: ["The blue apron is yours.", "Passable. Herr Becher sighs, but hands over the apron.", "Herr Becher refills himself and says nothing."],
+    e: ["A true Köbes: you never asked once.", "Good enough for the StäV cellar. Nobody there knows the difference anyway.", "Even a Kölsch glass would have done better. Take it again."]
+  },
+  b: {
+    brand: "Kalle's <span>Loyalty Test</span>",
+    ih: "Prove you're not a Cologne spy.",
+    ip: "Kalle, the St&auml;V cook from D&uuml;sseldorf, will leave the cellar door open for one man only: a real D&uuml;sseldorf heart. Cologne has sent spies before. They all said &ldquo;Kölsch&rdquo; by question three. 20 seconds per question. Fast and right earns the most points.",
+    start: "Start the test", again: "Take the test again",
+    v: ["The cellar door will be open.", "Kalle squints, then nods. The door will be open. Just.", "Kalle suspects you of Kölsch."],
+    e: ["Kalle wipes a tear on his apron. Nobody has spoken his language in this kitchen for eleven years.", "Not perfect, but no spy would know this much. Cologne doesn't study.", "He's not opening anything for you yet. Take it again."]
+  }
+};
+let ver = /[#?&](b|cook)\b/.test(location.hash + location.search) ? "b" : "a";
+function applyVer() {
+  const x = V[ver];
+  $("brand").innerHTML = x.brand; $("ih").innerHTML = x.ih; $("ip").innerHTML = x.ip;
+  $("start").textContent = x.start; $("again").textContent = x.again;
+  document.title = $("brand").textContent;
+}
+document.querySelectorAll("#preview a").forEach(a => a.onclick = e => { e.preventDefault(); ver = a.dataset.v; i = 0; score = 0; correct = 0; cancelAnimationFrame(raf); applyVer(); show("intro"); stats(); });
+function finish() {
+  show("end");
+  const pct = correct / Q.length, k = pct >= 0.8 ? 0 : pct >= 0.5 ? 1 : 2;
+  $("final").textContent = score + " points";
+  $("verdict").textContent = V[ver].v[k];
+  $("endtext").textContent = correct + " of " + Q.length + " right. " + V[ver].e[k];
+}
+$("start").onclick = () => { i = 0; score = 0; correct = 0; show("game"); ask(); };
+$("again").onclick = () => { i = 0; score = 0; correct = 0; show("game"); ask(); };
+$("next").onclick = () => { i++; if (i >= Q.length) finish(); else ask(); };
+applyVer();
+stats();
+</script>
+</body>
+</html>

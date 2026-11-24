@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Great Christmas Heist</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#13211b">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=Homemade+Apple&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #13211b; --panel: #1c2e26; --panel-2: #24392f; --line: #2f4a3d;
+  --ink: #f4f1ea; --muted: #b7c2bb; --copper: #d08a4e; --copper-soft: #3a2a1c;
+  --good: #4fbf7a; --bad: #e0606b; --kate: #e6c36a;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-story: "Newsreader", Georgia, serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; min-height: 100vh; }
+a { color: var(--copper); }
+button { font: inherit; color: inherit; }
+.wrap { max-width: 640px; margin: 0 auto; padding: 18px 18px 64px; }
+.hidden { display: none !important; }
+
+/* Kate's preview bar */
+
+/* home */
+.title { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 8vw, 44px); line-height: 1.02; margin: 18px 0 6px; letter-spacing: -0.01em; }
+.title span { color: var(--copper); display: block; }
+.sub { color: var(--muted); margin: 0 0 22px; line-height: 1.5; }
+.doors { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 520px) { .doors { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.door { aspect-ratio: 1; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); display: grid; place-items: center; position: relative; cursor: pointer; font-family: var(--font-display); font-weight: 800; font-size: 22px; transition: transform .08s, background .2s; }
+.door:hover { background: var(--panel-2); }
+.door:active { transform: scale(.97); }
+.door.locked { cursor: default; color: #5f7469; background: transparent; border-style: dashed; }
+.door.done { color: var(--muted); }
+.door.done::after { content: "✓"; position: absolute; right: 7px; bottom: 4px; font-size: 13px; color: var(--good); font-family: var(--font-body); }
+.door.next { background: var(--copper); color: #1a120b; border-color: var(--copper); }
+.door.next::before { content: ""; position: absolute; inset: -5px; border-radius: 18px; border: 2px solid var(--copper); opacity: .5; animation: pulse 2s infinite; }
+@keyframes pulse { 50% { opacity: 0; transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .door.next::before { animation: none; } }
+.cta { margin: 22px 0 0; display: flex; gap: 10px; flex-wrap: wrap; }
+.btn { border: 0; border-radius: 12px; background: var(--copper); color: #1a120b; font-weight: 600; padding: 13px 20px; cursor: pointer; font-size: 16px; text-decoration: none; display: inline-block; }
+.btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
+.btn:focus-visible, .door:focus-visible, .choice:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.note { color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+/* reader */
+.back { background: none; border: 0; color: var(--muted); cursor: pointer; padding: 8px 0; font-size: 15px; }
+.dateline { color: var(--copper); font-weight: 600; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; margin: 14px 0 6px; }
+h1.page { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 8vw, 40px); line-height: 1.05; margin: 0 0 18px; }
+.story p { font-family: var(--font-story); font-size: 20px; line-height: 1.55; margin: 0 0 16px; }
+.story p em { color: #e9dfcc; }
+.story p b { font-weight: 500; color: var(--copper); }
+.card { background: var(--panel); border-radius: 16px; padding: 18px; margin: 18px 0; }
+.card h3 { margin: 0 0 6px; font-family: var(--font-display); font-size: 18px; }
+.card p { margin: 0 0 10px; color: var(--muted); line-height: 1.5; }
+.puzzle { border: 1px dashed var(--line); background: transparent; color: var(--muted); font-size: 14px; }
+.katenote { border: 1px dashed #6a5a26; background: #211d10; color: var(--kate); font-size: 14px; line-height: 1.5; }
+.katenote b { display: block; margin-bottom: 4px; }
+.choices { display: grid; gap: 12px; margin: 26px 0 8px; }
+.choice { text-align: left; border: 1.5px solid var(--line); background: var(--panel); border-radius: 14px; padding: 16px 16px 16px 58px; position: relative; cursor: pointer; font-size: 17px; line-height: 1.35; min-height: 64px; }
+.choice .l { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; background: var(--copper-soft); color: var(--copper); }
+.choice:hover { border-color: var(--copper); }
+.choice.armed { border-color: var(--copper); background: var(--copper-soft); }
+.choice.armed::after { content: "Tap again to confirm"; display: block; font-size: 13px; color: var(--copper); margin-top: 4px; }
+.choice.picked { border-color: var(--copper); background: var(--copper-soft); cursor: default; }
+.choice.picked .l { background: var(--copper); color: #1a120b; }
+.choice.off { opacity: .35; cursor: default; }
+.after { text-align: center; color: var(--muted); margin: 18px 0; line-height: 1.5; }
+.ask { display: flex; gap: 8px; margin-top: 10px; }
+.ask input { flex: 1; min-width: 0; background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px; color: var(--ink); padding: 12px; font-size: 17px; text-transform: uppercase; letter-spacing: .04em; }
+.ask input:focus { outline: none; border-color: var(--copper); }
+.msg { min-height: 20px; font-size: 14px; margin-top: 8px; }
+.msg.no { color: var(--bad); } .msg.ok { color: var(--good); }
+.qr { display: flex; gap: 12px; align-items: center; }
+.qr .icon { font-size: 34px; }
+.small { font-size: 13px; }
+.linkbtn { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 0; font-size: 13px; }
+
+/* photo */
+.photo { position: relative; border-radius: 12px; overflow: hidden; margin: 6px 0 4px; }
+.photo img { display: block; width: 100%; height: auto; }
+.photo .meta { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 12px; background: linear-gradient(transparent, rgba(0,0,0,.7)); font-size: 13px; color: #eee; }
+.info { position: absolute; right: 10px; top: 10px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(0,0,0,.55); color: #fff; font-size: 20px; cursor: pointer; }
+.exif { background: #f4f2ee; color: #1d1d1b; border-radius: 12px; padding: 14px 16px; margin-top: 10px; font-size: 14px; line-height: 1.6; }
+.exif .r { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid #ddd8cf; padding: 4px 0; }
+.exif .r:last-child { border: 0; }
+.exif span:first-child { color: #6b6860; }
+.exif button { border: 1px solid #c9c3b8; background: #fff; border-radius: 8px; padding: 6px 10px; cursor: pointer; margin-top: 8px; color: #1d1d1b; }
+
+/* Deutsche Bummelbahn */
+.phone { background: #f6f5f2; color: #1d1d1b; border-radius: 22px; padding: 20px 18px; max-width: 360px; margin: 18px auto; box-shadow: 0 0 0 8px #0b130f; }
+.phone .hd { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 18px; }
+.phone .logo { width: 30px; height: 20px; border-radius: 4px; background: #b3262d; color: #fff; font: 800 11px/20px var(--font-body); text-align: center; letter-spacing: .02em; }
+.phone .lock { text-align: center; font-size: 28px; margin: 6px 0 4px; }
+.phone .who { text-align: center; color: #6b6860; font-size: 14px; margin-bottom: 16px; }
+.phone label { font-size: 12px; color: #6b6860; }
+.phone input { width: 100%; padding: 12px; border: 1.5px solid #cfc9be; border-radius: 10px; font-size: 17px; margin: 4px 0; text-transform: uppercase; background: #fff; color: #1d1d1b; }
+.phone input:focus { outline: none; border-color: #b3262d; }
+.phone .go { width: 100%; background: #b3262d; color: #fff; border: 0; border-radius: 10px; padding: 12px; font-weight: 600; cursor: pointer; margin-top: 6px; }
+.phone .err { color: #b3262d; font-size: 13px; min-height: 18px; }
+.trip { border: 1px solid #ddd8cf; border-radius: 12px; padding: 14px; background: #fff; }
+.trip .d { font-size: 12px; color: #6b6860; }
+.trip .rt { font-size: 18px; font-weight: 600; margin: 4px 0 2px; }
+.trip .st { font-size: 13px; color: #b3262d; margin-bottom: 10px; }
+.trip .g { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.trip .g div { background: #f1efea; border-radius: 8px; padding: 8px; }
+.trip .g small { display: block; font-size: 11px; color: #6b6860; }
+.trip .g b { font-size: 20px; }
+.trip .lg { font-size: 13px; margin-top: 10px; }
+.bonus { font-size: 12px; color: #6b6860; margin-top: 12px; }
+.end { text-align: center; padding: 26px 0; }
+.end .big { font-family: var(--font-display); font-weight: 800; font-size: 34px; color: var(--copper); }
+.path { font-family: var(--font-display); letter-spacing: .12em; color: var(--muted); word-break: break-all; }
+
+.stamp { display: inline-block; font-family: ui-monospace, Menlo, monospace; font-size: 17px; background: #0e1813; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; color: var(--ink); letter-spacing: .03em; }
+em.ann { display: block; font-family: var(--font-body); font-style: normal; font-size: 15px; background: #0e1813; border-left: 3px solid #b3262d; padding: 10px 12px; border-radius: 0; color: #e9e4da; }
+em.hand, .letter { font-family: "Homemade Apple", "Segoe Script", cursive; }
+em.hand { font-size: 18px; }
+.paper { background: #f3ecdc; color: #2a2620; border-radius: 6px; padding: 18px 18px 14px; margin: 16px 0; box-shadow: 0 2px 0 #c9bfa8; }
+.letter { font-size: 13px; line-height: 1.9; }
+.letter p { margin: 0 0 10px; }
+.letter .s1 { font-size: 14px; } .letter .s2 { font-size: 12px; } .letter .s3 { font-size: 10.5px; } .letter .s4 { font-size: 9px; }
+.tbl { width: 100%; border-collapse: collapse; font: 12.5px/1.35 ui-monospace, Menlo, monospace; }
+.tbl th, .tbl td { text-align: left; padding: 5px 4px; border-bottom: 1px solid #d8cfba; vertical-align: top; }
+.tbl th { font-weight: 700; color: #6b6150; }
+.doc-h { font: 700 12px var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: #8a7d64; margin-bottom: 8px; }
+.coaster { width: 230px; height: 230px; border-radius: 50%; background: #fbfaf6; color: #333; margin: 16px auto; display: grid; place-items: center; text-align: center; box-shadow: inset 0 0 0 10px #f0ece2, 0 2px 0 #c9bfa8; position: relative; }
+.coaster .mir { transform: scaleX(-1); font: 13px "Homemade Apple", cursive; line-height: 1.8; color: #5a5650; }
+.tally { font: 30px/1.2 "Homemade Apple", cursive; letter-spacing: 2px; color: #2a2620; }
+.tally s { text-decoration-thickness: 2px; }
+.tick { display: grid; grid-template-columns: 1fr 1fr; border-radius: 8px; overflow: hidden; margin: 16px 0; font-family: var(--font-body); }
+.tick > div { padding: 14px; min-height: 120px; }
+.tick .l { background: #2a2f2c; color: #8f9a93; border-right: 2px dashed #555; }
+.tick .r { background: #f3f1ea; color: #222; }
+.tick small { display: block; font-size: 11px; color: #7c776d; }
+.tick b { font-size: 22px; }
+.mug { background: #e9e5da; color: #2a2620; border-radius: 6px; padding: 16px; margin: 16px 0; text-align: center; }
+.mug svg { width: 100%; max-width: 280px; height: auto; display: block; margin: 0 auto; }
+.mug .cap { font: 700 13px ui-monospace, monospace; letter-spacing: .08em; margin-top: 6px; }
+.anns { display: grid; gap: 8px; margin: 14px 0; }
+.anns div { background: #0e1813; border-left: 3px solid #b3262d; padding: 9px 12px; font-size: 14px; color: #e9e4da; }
+.anns b { color: #fff; }
+.restart { display: block; margin: 40px auto 0; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <section id="home"></section>
+  <section id="reader" class="hidden"></section>
+</div>
+
+<script src="content.js"></script>
+<script>
+// WALKTHROUGH = true: each day opens as soon as the previous one is done (for Kate to read it all now).
+// WALKTHROUGH = false: Tobi's copy, each day opens on its real date in December.
+const WALKTHROUGH = false;
+let installEvt = null;
+const H = window.HEIST, Y = H.year, KEY = "heist" + Y + (WALKTHROUGH ? "-walk" : "");
+const WEEK = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const $ = s => document.querySelector(s);
+
+function load(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+let S = load(KEY, { picks: {}, solved: {} });
+S.picks = S.picks || {}; S.solved = S.solved || {};
+const persist = () => save(KEY, S);
+
+// ---------- story logic ----------
+function versionKey(n) {
+  if (n === 0) return "X";
+  if (n === 1) return S.picks[0] || null;
+  if (n === 2) return S.picks[0] && S.picks[1] ? S.picks[0] + "-" + S.picks[1] : null;
+  if (n === 23) return S.picks[21] && S.picks[22] ? S.picks[21] + "-" + S.picks[22] : null;
+  return S.picks[n - 1] || null;
+}
+function page(n) {
+  const d = H.days[n], k = versionKey(n);
+  if (!k) return null;
+  return Object.assign({}, d, d.versions[k], { key: k, n });
+}
+const hasChoice = n => !H.days[n].end;
+const isDone = n => hasChoice(n) ? !!S.picks[n] : !!S.solved[n];
+function firstMissing(n) { for (let k = 0; k < n; k++) if (hasChoice(k) && !S.picks[k]) return k; return null; }
+const doorDone = d => d === 1 ? isDone(0) && isDone(1) : isDone(d);
+const doorTarget = d => d === 1 && !S.picks[0] ? 0 : d;
+function realToday() {
+  const n = new Date();
+  if (n.getFullYear() < Y || (n.getFullYear() === Y && n.getMonth() < 11)) return 0;
+  return n.getFullYear() > Y ? 31 : n.getDate();
+}
+function doorOpen(d) { return WALKTHROUGH ? (d === 1 || doorDone(d - 1)) : d <= realToday(); }
+const unlocked = n => doorOpen(Math.max(1, H.days[n].date));
+function nextDoor() { for (let d = 1; d <= 24; d++) if (doorOpen(d) && !doorDone(d)) return d; return null; }
+const dateLabel = d => WEEK[new Date(Y, 11, d).getDay()] + ", " + d + " December";
+
+// ---------- case file: the path as letters, to restore if storage is lost ----------
+function caseCode() { let c = ""; for (let k = 0; k <= 23 && S.picks[k]; k++) c += S.picks[k]; return c; }
+const fmtCode = c => c.replace(/(.{4})(?=.)/g, "$1-");
+function restoreCode(raw) {
+  const c = raw.toUpperCase().replace(/[^AB]/g, "");
+  if (!c || c.length > 24) return false;
+  S = { picks: {}, solved: {} };
+  for (let k = 0; k < c.length; k++) { S.picks[k] = c[k]; S.solved[k] = true; }
+  persist(); if (typeof syncLink === "function") syncLink(); return true;
+}
+
+// ---------- progress in the link: ?c=AABA (survives incognito as long as the tab or link is kept) ----------
+function syncLink() {
+  const c = caseCode(), q = new URLSearchParams(location.search);
+  q.delete("pick"); if (c) q.set("c", c); else q.delete("c");
+  const qs = q.toString();
+  history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+}
+(function () {
+  const m = /[?&]c=([ABab]+)/.exec(location.search);
+  if (m && m[1].length > caseCode().length) restoreCode(m[1]);
+})();
+
+// ---------- QR deep links: ?pick=9A ----------
+(function () {
+  const m = /[?&]pick=(\d+)([AB])/.exec(location.search);
+  if (!m) return;
+  const n = +m[1];
+  if (H.days[n] && !S.picks[n]) { S.picks[n] = m[2]; persist(); }
+  history.replaceState(null, "", location.pathname + "#" + Math.min(n + 1, 24));
+  syncLink();
+})();
+
+// ---------- home ----------
+function renderHome() {
+  const nd = nextDoor();
+  let doors = "";
+  for (let d = 1; d <= 24; d++) {
+    const open = doorOpen(d), cls = !open ? "locked" : d === nd ? "next" : doorDone(d) ? "done" : "";
+    doors += `<button class="door ${cls}" data-d="${d}" ${!open ? 'aria-disabled="true"' : ""} aria-label="${d} December${!open ? ", locked" : ""}">${open ? d : ""}</button>`;
+  }
+  let lead;
+  if (!WALKTHROUGH && realToday() < 1) lead = "The first door opens on Tuesday, 1 December.";
+  else if (nd) lead = nd === 1 && !S.picks[0] ? "Something has gone missing." : "Today's page is waiting.";
+  else if (doorDone(24)) lead = "Case closed. Until next year.";
+  else lead = "That's everything for today. The next door opens tomorrow.";
+  $("#home").innerHTML = `
+    <h1 class="title">The Great <span>Christmas Heist</span></h1>
+    <p class="sub">${lead}</p>
+    <div class="doors">${doors}</div>
+    <div class="cta">${nd ? `<button class="btn" id="opennext">Open ${nd} December</button>` : ""}${installEvt ? `<button class="btn ghost" id="install">Install the case files</button>` : ""}</div>
+    ${!installEvt && !standalone() && /Android/.test(navigator.userAgent) && /Firefox/.test(navigator.userAgent) ? `<p class="note" style="margin-top:14px">Keep the case files on your home screen: tap <b>⋮</b>, then <b>Add app to Home screen</b>.</p>` : ""}
+    ${caseCode() ? `<p class="note" style="margin-top:28px">Case file <b style="letter-spacing:.08em">${fmtCode(caseCode())}</b>. Keep it: if your progress ever goes missing, this brings it back.</p>` : ""}
+    <div style="margin-top:${caseCode() ? 8 : 28}px"><button class="linkbtn" id="haveCode">${caseCode() ? "Restore a different case file" : "Lost your progress? Enter your case file"}</button></div>
+    <div id="codeBox" class="${!caseCode() && !WALKTHROUGH && realToday() > 1 ? "" : "hidden"}" style="margin-top:10px"><div class="ask"><input id="codeIn" placeholder="AABA-BBAB" autocomplete="off" aria-label="Case file"><button class="btn" id="codeGo">Restore</button></div><div class="msg" id="codeMsg"></div></div>
+    ${WALKTHROUGH && (S.picks[0] || doorDone(24)) ? `<button class="linkbtn restart" id="restart">Start over from 1 December</button>` : ""}`;
+  document.querySelectorAll(".door").forEach(b => b.onclick = () => { const d = +b.dataset.d; if (doorOpen(d)) go(doorTarget(d)); });
+  const on = $("#opennext"); if (on) on.onclick = () => go(doorTarget(nd));
+  $("#haveCode").onclick = () => { $("#codeBox").classList.toggle("hidden"); $("#codeIn").focus(); };
+  $("#codeGo").onclick = () => { if (restoreCode($("#codeIn").value)) renderHome(); else { $("#codeMsg").className = "msg no"; $("#codeMsg").textContent = "That's not a case file. It's only A and B, like AABA-BBAB."; } };
+  const ib = $("#install"); if (ib) ib.onclick = async () => { installEvt.prompt(); await installEvt.userChoice; installEvt = null; renderHome(); };
+  const rs = $("#restart"); if (rs) rs.onclick = () => {
+    if (!rs.dataset.armed) { rs.dataset.armed = "1"; rs.textContent = "Tap again to forget all choices and start over"; rs.style.color = "var(--copper)"; return; }
+    S = { picks: {}, solved: {} }; persist(); syncLink(); location.hash = ""; renderHome(); window.scrollTo(0, 0);
+  };
+}
+
+// ---------- routing ----------
+function go(n) { location.hash = n === 0 ? "prologue" : String(n); }
+function route() {
+  const h = location.hash.slice(1);
+  if (!h) return show("home");
+  const n = h === "prologue" ? 0 : +h;
+  if (!H.days[n] || !unlocked(n)) return show("home");
+  const miss = firstMissing(n);
+  if (miss === 9 && n === 10) return renderScanNote();
+  if (miss !== null && miss !== n) return renderReader(miss, "You skipped a page. Start here.");
+  renderReader(n);
+}
+function show(id) {
+  $("#home").classList.toggle("hidden", id !== "home");
+  $("#reader").classList.toggle("hidden", id !== "reader");
+  if (id === "home") renderHome();
+  window.scrollTo(0, 0);
+}
+
+// ---------- reader ----------
+const paras = a => a.map(x => `<p>${x}</p>`).join("");
+function isGated(p) { return !!(p.gate || p.widget === "bahn" || (p.widget || "").startsWith("quiz")); }
+function renderReader(n, banner) {
+  const p = page(n), d = H.days[n];
+  show("reader");
+  let h = `<button class="back" id="back">← All doors</button>`;
+  if (banner) h += `<div class="card"><p>${banner}</p></div>`;
+  h += `<div class="dateline">${n === 0 ? "1 December · Prologue" : dateLabel(d.date)}</div>`;
+  h += `<h1 class="page">${p.title}</h1>`;
+  h += `<div class="story">${paras(p.p)}</div><div id="widget"></div><div id="rest"></div>`;
+  $("#reader").innerHTML = h;
+  $("#back").onclick = () => { location.hash = ""; };
+  renderWidget(p);
+  if (!isGated(p) || S.solved[n]) renderRest(p);
+  else if (p.gate) renderGate(p);
+}
+function solve(p) { S.solved[p.n] = true; persist(); $("#rest").innerHTML = ""; renderRest(p); }
+function renderGate(p) {
+  const w = document.createElement("div");
+  w.className = "card";
+  w.innerHTML = `<h3>${p.gate.q}</h3><div class="ask"><input id="gin" autocomplete="off" autocapitalize="characters" aria-label="Your answer"><button class="btn" id="gok">Check</button></div><div class="msg" id="gmsg"></div><button class="linkbtn" id="ghint">Need a hint?</button>`;
+  $("#rest").appendChild(w);
+  const check = () => {
+    const v = $("#gin").value.trim().toUpperCase().replace(/[\s.\-]/g, "");
+    if (!v) { $("#gmsg").className = "msg no"; $("#gmsg").textContent = "Type an answer first."; return; }
+    if (p.gate.a.some(a => v.includes(a.replace(/[\s.\-]/g, "")))) solve(p);
+    else { $("#gmsg").className = "msg no"; $("#gmsg").textContent = "Herr Becher shakes his head. Not quite."; }
+  };
+  $("#gok").onclick = check;
+  $("#gin").onkeydown = e => { if (e.key === "Enter") check(); };
+  $("#gin").oninput = () => { $("#gmsg").textContent = ""; };
+  $("#ghint").onclick = () => { $("#gmsg").className = "msg"; $("#gmsg").textContent = p.gate.hint; };
+}
+
+const W = {
+  log: () => `<div class="paper"><div class="doc-h">BER-07 · Gang 12 · Warenein- und -ausgang</div><table class="tbl"><tr><th>Datum</th><th>Zeit</th><th>Fahrer</th><th>Ladung</th><th>PLZ</th></tr>
+    ${[["23.11.","07:40","M. Özdemir","24 × Alt 0,5","10997"],["23.11.","09:15","J. Wolff","12 × Pils 0,33","12043"],["24.11.","06:55","M. Özdemir","40 × Alt 0,5","10245"],["24.11.","11:20","S. Nowak","Leergut","13355"],["25.11.","07:05","J. Wolff","18 × Alt 0,5","10115"],["25.11.","14:30","S. Nowak","Gläser, 60 Stk.","10437"],["26.11.","08:10","M. Özdemir","30 × Alt 0,5","12047"],["27.11.","07:45","J. Wolff","Leergut","10999"],["27.11.","10:00","S. Nowak","20 × Alt 0,5","10247"],["28.11.","06:30","M. Özdemir","Fass 30 l, Alt","10435"],["29.11.","08:20","J. Wolff","24 × Alt 0,5","10783"],["30.11.","03:00","K.","1 Geist, leicht gebraucht (Eingang)","52159 → 50667"],["30.11.","09:40","S. Nowak","Leergut","12049"],["01.12.","07:15","M. Özdemir","36 × Alt 0,5","10961"],["01.12.","10:50","J. Wolff","Kronkorken, 1 Karton","10405"]].map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`,
+  coaster: () => `<div class="coaster" aria-label="The back of the coaster, written in mirror writing"><div class="mir">Noch eins?<br>50667</div></div>`,
+  letter: () => `<div class="paper letter">
+    <p class="s1">Altbier boy,</p>
+    <p class="s1">how dare you. How DARE you. I have read your so-called letter four times, and each time it got worse. "Water that gives up halfway." Kölsch does not give up. Kölsch is light because it has nothing to prove. Unlike a certain brown drink that has to taste of everything at once because it is insecure.</p>
+    <p class="s2">Altbier is brown Kölsch with an attitude. There, I've said it. Brown Kölsch with an attitude and a city that thinks a long bar is a personality. You drink it from 0.25-litre glasses as if the extra 0.05 made you a better person. It does not. It only makes you slower.</p>
+    <p class="s2">You think you are clever because you can read a label. I have been on trays since before your grandfather could hold one. I have seen weddings, funerals, carnival, a Pope, and every World Cup since 1954, all four German titles included, and at every single one of them I was emptied in one gulp. I know what a family looks like when it's had too much of a good thing. Yours has had too much for decades. Someone had to make it smaller.</p>
+    <p class="s3">And I have. Your Spirit is safe, by the way. Cool, dry, quiet, as a Spirit should be. Nobody shouting about politics at 2 a.m. Nobody eating until they need salad. I have done your family a favour, and in time they will thank me.</p>
+    <p class="s3">Do not write to me again.</p>
+    <p class="s3">Herr Klein, 0.2 l</p>
+    <p class="s4">P.S. And don't bother looking for it in Roetgen. I've poured it into a Pittermännchen, a proper little barrel, and on 23 December it will be tapped in Cologne, in front of everyone, and served in proper glasses, one at a time, the way it should have been all along. Small. Clean. Quiet. You'll have a lovely, quiet Christmas.</p>
+    <p class="s4">P.P.S. Noch eins?</p></div>`,
+  tally: () => `<div class="paper"><div class="doc-h">Köbes · Tisch 12</div><div class="tally"><s>||||</s> <s>||||</s> <s>||||</s> <s>||||</s> |||</div><div class="tally"><s>||||</s> <s>||||</s> ||</div><div class="small" style="color:#6b6150;margin-top:8px">1 Pittermännchen, Weihnachtsgeist, zum Anstich</div></div>`,
+  invoice: () => `<div class="paper"><div class="doc-h">Kölsch Konsortium · Rechnung Nr. 0,2</div><table class="tbl"><tr><th>Pos.</th><th>Leistung</th><th>Betrag</th></tr>
+    ${[["Stangen, 200 Stück, gespült","84,00"],["Transport Roetgen–Berlin, nachts","312,50"],["Abfüllung in Pittermännchen, 10 l","45,00"],["Etiketten, schief aufgeklebt","12,80"],["Verschwiegenheitszulage, Köbes","1.000,00"]].map((r, i) => `<tr><td>${i + 1}</td><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</table><div class="small" style="color:#6b6150;margin-top:8px">Rechnungsempfänger: Hr. K. · Zahlbar sofort. Ohne Nachfrage.</div></div>`,
+  casktag: () => `<div class="paper" style="max-width:300px;margin:16px auto;font:13px/1.7 ui-monospace,Menlo,monospace;position:relative"><div style="position:absolute;top:12px;right:14px;width:14px;height:14px;border-radius:50%;border:2px solid #8a7d64"></div><div class="doc-h">Tag on the barrel · copied by T.</div>Pittermännchen · 10 l<br>Inhalt: Weihnachtsgeist<br>Lager: StäV, Keller<br>Abgang: 23.12. · ICE<br>Berlin Hbf → Köln Hbf<br>Wagen: Klein × 35<br>Anstich: 23.12., abends<br><div class="small" style="color:#6b6150;margin-top:8px">Nicht stürzen. Nicht öffnen. Nicht fragen.</div></div>`,
+  dossier: () => `<div class="paper" style="max-width:320px;margin:16px auto;position:relative;padding-top:26px"><div style="position:absolute;top:-10px;left:12px;right:8px;display:flex;gap:3px;overflow:hidden">${["Mugshot","Barrel","StäV","Ticket","Sketch","Konvention","Post"].map((t,i)=>`<span style="font:600 9px var(--font-body);background:${["#e8dcbf","#dfe8d0","#e8d3cf","#d6dfe8","#e8e3c9","#e2d6e8","#f0d9b5"][i]};color:#4a4234;padding:4px 4px 3px;border-radius:4px 4px 0 0;white-space:nowrap;box-shadow:0 -1px 0 #c9bfa8">${t}</span>`).join("")}</div><div class="doc-h">Dossier · Herr Klein</div><div style="font:13px/1.8 ui-monospace,Menlo,monospace">1 · Mugshot, 0.2 l<br>2 · Pittermännchen, 10 l, Anstich 23.12.<br>3 · StäV: address, hours, floor plan<br>4 · Half ticket: Berlin Hbf, 23.12., <u>Wagen 7</u><br>5 · Sketch from the fire, one man circled<br>6 · Kölsch-Konvention, §§ underlined<br>7 · Envelope, no sender</div><div class="small" style="color:#6b6150;margin-top:8px">Held together with a rubber band.</div></div>`,
+  postcard: () => `<div style="max-width:340px;margin:16px auto"><img src="assets/klein-postcard.jpg" alt="A postcard: I ♥ Köln, Gruß aus Köln, with the cathedral, the Hohenzollern Bridge, the Old Town, a Rhine boat, a Kölsch pub and carnival" style="width:100%;display:block;border-radius:6px;box-shadow:0 2px 0 #c9bfa8">
+    <div class="paper" style="margin:10px 0 0;display:grid;grid-template-columns:1.3fr 1fr;gap:14px;aspect-ratio:1200/896;box-sizing:border-box;width:100%;border-radius:6px">
+      <div style="border-right:1px solid #d8cfba;padding-right:12px;font:italic 14px/1.5 Georgia,serif;color:#2a2620;font-size:12.5px;letter-spacing:.02em">Too late, Altbier boy.<br>Greetings from home.<br><br><span style="font-style:normal">— K.</span></div>
+      <div style="font:12px/1.9 ui-monospace,Menlo,monospace;color:#4a4234"><div style="border:1px dashed #a89a7c;width:44px;height:52px;margin:0 0 8px auto;display:flex;align-items:center;justify-content:center;font-size:9px;text-align:center;line-height:1.2">0,2</div>Herrn Tobi<br>Berlin<br><span style="color:#8a7d64">by hand · Köbes</span></div>
+    </div></div>`,
+  receipt: () => `<div class="paper" style="max-width:300px;margin:16px auto;font:13px/1.6 ui-monospace,Menlo,monospace"><div class="doc-h">Notizen · Köbes</div>Mo 20:00 Friedrichstr. → Jannowitzbr.<br>Di 20:00 Friedrichstr. → Ostkreuz<br>Mi 20:00 Friedrichstr. → Hackescher M.<br>Do 20:00 Friedrichstr. → Alexanderpl.<br>Fr 20:00 Friedrichstr. → Jannowitzbr.<br><br>Schicht: StäV ab 17:00<br>Feierabend: 20:00. Nie fragen.</div>`,
+  ticket: () => `<div class="tick" style="grid-template-columns:1fr"><div class="r" style="clip-path:polygon(0 0,100% 0,100% 100%,0 100%,4% 88%,0 76%,5% 64%,0 52%,4% 40%,0 28%,5% 16%,0 6%);padding-left:26px"><small>The other half · found in the snow</small><b>→ Köln Hbf</b><br>Wagen 7 · Platz 0,2<br><small style="margin-top:8px">2. Klasse · Fenster · gültig nur in Begleitung eines Pittermännchens</small></div></div>`,
+  announcements: () => `<div class="anns">${[["Friedrichstraße","S5 nach Westkreuz","11"],["Ostkreuz","S7 nach Potsdam","15"],["Alexanderplatz","S3 nach Erkner","5"],["Jannowitzbrücke","S9 nach Flughafen BER","12"],["Warschauer Straße","S75 nach Wartenberg","14"]].map(a => `<div>${a[0]}: „Die <b>${a[1]}</b> hat heute etwa <b>${a[2]} Minuten</b> Verspätung. Wir bitten um Entschuldigung.“</div>`).join("")}</div>`,
+  mugshot: () => `<div class="mug"><svg viewBox="0 0 280 300" role="img" aria-label="Mugshot of Herr Klein, a narrow 0.2 litre Kölsch glass, in front of a height chart">
+      <rect width="280" height="300" fill="#d9d4c7"/>
+      ${[0,1,2,3,4,5,6].map(i => `<line x1="0" x2="280" y1="${40 + i * 35}" y2="${40 + i * 35}" stroke="#a9a293" stroke-width="1.5"/><text x="8" y="${36 + i * 35}" font-size="11" font-family="monospace" fill="#6b6555">${Math.abs(0.6 - i * 0.1).toFixed(1)} l</text>`).join("")}
+      <path d="M118 120 L162 120 L158 270 L122 270 Z" fill="#f7e9a8" stroke="#555" stroke-width="2"/>
+      <path d="M118 120 L162 120 L161 140 L119 140 Z" fill="#fff" stroke="#555" stroke-width="2"/>
+      <ellipse cx="140" cy="120" rx="22" ry="4" fill="#fff" stroke="#555" stroke-width="2"/>
+      <path d="M131 190 q4 -4 8 0 M143 190 q4 -4 8 0" stroke="#333" stroke-width="2" fill="none"/>
+      <path d="M132 212 q8 -4 16 0" stroke="#333" stroke-width="2" fill="none"/>
+      <rect x="90" y="250" width="100" height="40" fill="#1d1d1b"/>
+      <text x="140" y="266" font-size="12" font-family="monospace" fill="#fff" text-anchor="middle">HERR KLEIN</text>
+      <text x="140" y="282" font-size="11" font-family="monospace" fill="#fff" text-anchor="middle">0,2 l · KÖLN</text>
+    </svg><div class="cap">WANTED · CHRISTMAS SPIRIT THEFT</div></div>`
+};
+
+function renderWidget(p) {
+  const w = $("#widget"), k = p.widget;
+  if (!k) return;
+  if (W[k]) { w.innerHTML = W[k](); return; }
+  if (k === "quiz-a" || k === "quiz-b") {
+    const b = k === "quiz-b";
+    w.innerHTML = `<div class="card"><h3>${b ? "Kalle's Loyalty Test" : "Herr Becher's Köbes Exam"}</h3><p>16 questions, 20 seconds each. Come back here when you're done.</p><div class="row" style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn" href="quiz.html${b ? "#b" : ""}">${b ? "Start the test" : "Start the exam"}</a>${S.solved[p.n] ? "" : `<button class="btn ghost" id="qdone">I've finished</button>`}</div></div>`;
+    const q = $("#qdone"); if (q) q.onclick = () => { q.remove(); solve(p); };
+  }
+  if (k === "photo" || k === "photo-info") {
+    const info = k === "photo-info";
+    w.innerHTML = `<div class="photo"><img src="assets/klein-cologne-photo.jpg" alt="A Christmas market by a river at night, a small beer glass on a wooden table in front"><div class="meta">Herr K. · Do, 17.12., 19:42</div>${info ? `<button class="info" id="ibtn" aria-label="Photo details">ⓘ</button>` : ""}</div><div id="exif"></div>`;
+    if (info) $("#ibtn").onclick = () => {
+      const e = $("#exif");
+      if (e.innerHTML) { e.innerHTML = ""; return; }
+      e.innerHTML = `<div class="exif"><div class="r"><span>Aufgenommen</span><span>Do, 17.12.2026, 19:42</span></div><div class="r"><span>Gerät</span><span>iPhone (Herr K.)</span></div><div class="r"><span>Ort</span><span>52.5115° N, 13.4249° E</span></div><button id="copyc">Copy coordinates</button> <span id="copied" class="small"></span></div>`;
+      $("#copyc").onclick = async () => { try { await navigator.clipboard.writeText("52.5115, 13.4249"); $("#copied").textContent = "Copied"; } catch (err) { $("#copied").textContent = "Select and copy them by hand"; } };
+    };
+  }
+  if (k === "bahn") renderBahn(p);
+}
+
+function bookingHTML() {
+  return `<div class="trip"><div class="d">Mi, 23.12.2026</div><div class="rt">Berlin Hbf → Köln Hbf</div><div class="st">ICE · planmäßig verspätet</div><div class="g"><div><small>Wagen</small><b>7</b></div><div><small>Platz</small><b>Fenster</b></div></div><div class="lg">🧳 Gepäck: 1 Pittermännchen (10 l)<br><span style="color:#6b6860">Inhalt: Weihnachtsgeist, zum Anstich</span></div></div><div class="bonus">Bonusprogramm: BahnCard 0,2 · Status: klein</div>`;
+}
+function renderBahn(p) {
+  const w = $("#widget");
+  if (S.solved[p.n]) { w.innerHTML = `<div class="phone"><div class="hd"><span class="logo">DB</span>Meine Reisen</div>${bookingHTML()}</div>`; return; }
+  w.innerHTML = `<div class="phone"><div class="hd"><span class="logo">DB</span>Deutsche Bummelbahn</div><div class="lock">🔒</div><div class="who">Mein Konto · Herr K., 0,2 l</div><label for="pw">Passwort</label><input id="pw" autocomplete="off" autocapitalize="characters"><div class="err" id="perr"></div><button class="go" id="pgo">Anmelden</button></div>`;
+  const tryIt = () => {
+    const v = $("#pw").value.trim().toUpperCase().replace(/\s+/g, "");
+    if (!v) { $("#perr").textContent = "Bitte Passwort eingeben."; return; }
+    if (v === "ALTBIERLIEBE") { S.solved[p.n] = true; persist(); renderBahn(p); renderRest(p); }
+    else $("#perr").textContent = "Falsch. Herr Becher is disappointed.";
+  };
+  $("#pgo").onclick = tryIt;
+  $("#pw").onkeydown = e => { if (e.key === "Enter") tryIt(); };
+  $("#pw").oninput = () => { $("#perr").textContent = ""; };
+}
+
+function renderScanNote() {
+  const p = page(9);
+  show("reader");
+  $("#reader").innerHTML = `<button class="back" id="back">← All doors</button><div class="dateline">${dateLabel(10)}</div><h1 class="page">Herr Becher's note</h1>
+    <div class="story"><p>Today's page is waiting, but the choice isn't in here. It's on the note from the fire.</p></div>
+    <div class="card"><div class="qr"><span class="icon">▦</span><div><h3>Scan one of the two codes on Herr Becher's note</h3><p>Whichever you choose, today's page opens straight away.</p></div></div>
+    <button class="linkbtn" id="noqr">Lost the note? Choose here instead.</button><div id="noqrc"></div></div>`;
+  $("#back").onclick = () => { location.hash = ""; };
+  $("#noqr").onclick = () => {
+    $("#noqrc").innerHTML = `<div class="choices">${p.choices.map((c, i) => `<button class="choice" data-qr="${"AB"[i]}"><span class="l">${"AB"[i]}</span>${c}</button>`).join("")}</div>`;
+    document.querySelectorAll("[data-qr]").forEach(b => b.onclick = () => { S.picks[9] = b.dataset.qr; persist(); syncLink(); renderReader(10); });
+  };
+}
+function renderRest(p) {
+  const r = $("#rest"), n = p.n;
+  let h = p.after ? `<div class="story">${paras(p.after)}</div>` : "";
+  if (p.end) {
+    if (!S.solved[n]) { S.solved[n] = true; persist(); }
+    let path = ""; for (let k = 0; k <= 23; k++) path += S.picks[k] || "·";
+    h += `<div class="end"><div class="big">The End.</div><p class="note">Until next year.</p><p class="path" title="Your path">${path}</p></div>`;
+    r.innerHTML = h; return;
+  }
+  const picked = S.picks[n];
+  if (p.qr && !picked && n === 9) {
+    // The 9th shows no choice at all: Tobi gets Herr Becher's note at the fire and scans a code on the 10th.
+    if (WALKTHROUGH) h += `<div class="card katenote" style="border:1px dashed #6a5a26;background:#211d10;color:#e6c36a;font-size:14px"><b>Only in your preview, Tobi doesn't see this box.</b> His page ends above. At the fire he gets Herr Becher's note with two QR codes, and on the 10th he scans one. To continue, tap the code he'd scan:<div class="choices" style="margin-top:10px">${p.choices.map((c, i) => `<button class="choice" data-qr="${"AB"[i]}"><span class="l">${"AB"[i]}</span>${c}</button>`).join("")}</div></div>`;
+    r.innerHTML = h;
+    r.querySelectorAll("[data-qr]").forEach(b => b.onclick = () => choose(n, b.dataset.qr));
+    return;
+  }
+  if (p.qr && !picked) {
+    h += `<div class="card"><div class="qr"><span class="icon">▦</span><div><h3>Your choice is on paper</h3><p>Scan one of the two QR codes on the printed page.</p></div></div>
+      ${WALKTHROUGH ? `<p class="small" style="color:var(--muted)">Here, tap the code you'd scan:</p><div class="choices" style="margin-top:6px">${p.choices.map((c, i) => `<button class="choice" data-qr="${"AB"[i]}"><span class="l">${"AB"[i]}</span>${c}</button>`).join("")}</div>` : `<button class="linkbtn" id="noqr">No paper to hand? Choose here instead.</button>`}</div>`;
+    r.innerHTML = h;
+    r.querySelectorAll("[data-qr]").forEach(b => b.onclick = () => choose(n, b.dataset.qr));
+    const nq = $("#noqr"); if (nq) nq.onclick = () => { p.qr = false; r.innerHTML = ""; renderRest(p); };
+    return;
+  }
+  h += `<div class="choices">${p.choices.map((c, i) => {
+    const L = "AB"[i], cls = picked ? (picked === L ? "picked" : "off") : "";
+    return `<button class="choice ${cls}" data-c="${L}" ${picked ? "disabled" : ""}><span class="l">${L}</span>${c}</button>`;
+  }).join("")}</div>`;
+  if (picked) h += afterChoice(n);
+  r.innerHTML = h;
+  if (!picked) r.querySelectorAll("[data-c]").forEach(b => b.onclick = () => {
+    if (b.classList.contains("armed")) return choose(n, b.dataset.c);
+    r.querySelectorAll("[data-c]").forEach(x => x.classList.remove("armed"));
+    b.classList.add("armed");
+  });
+  const nb = $("#nextbtn"); if (nb) nb.onclick = () => go(+nb.dataset.n);
+}
+function afterChoice(n) {
+  const nx = n + 1;
+  const cf = `<p class="small" style="color:var(--muted);margin-top:14px">Case file: <b style="letter-spacing:.08em">${fmtCode(caseCode())}</b></p>`;
+  if (nx > 24) return "";
+  if (WALKTHROUGH) return `<div class="after">${n === 0 ? "" : "See you tomorrow.<br><br>"}<button class="btn" id="nextbtn" data-n="${nx}">${n === 0 ? "Read on" : "Open " + nx + " December"} →</button>${cf}</div>`;
+  if (unlocked(nx)) return `<div class="after">Noted.<br><br><button class="btn" id="nextbtn" data-n="${nx}">${n === 0 ? "Read on" : "Open " + nx + " December"} →</button></div>`;
+  return `<div class="after">Noted. Your next page opens on ${dateLabel(H.days[nx].date)}.${cf}</div>`;
+}
+function choose(n, L) {
+  if (S.picks[n]) return;
+  S.picks[n] = L; persist(); syncLink();
+  renderReader(n);
+  const a = document.querySelector(".after"); if (a) a.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function standalone() { try { return matchMedia("(display-mode: standalone)").matches; } catch (e) { return false; } }
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; if (!$("#home").classList.contains("hidden")) renderHome(); });
+window.addEventListener("appinstalled", () => { installEvt = null; });
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
