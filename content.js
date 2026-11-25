@@ -496,7 +496,7 @@ window.HEIST = {
         "Tobi still doesn't know who cut off his call to Kasia. He only knows what it sounded like: a station announcement. A voice that apologised for ending it.",
         "Whoever it is, they fight with delays. And whoever it is, they're on Herr Klein's side. Fine. Two can play that game. Tobi is a logistics man. He knows exactly how to make something not arrive.",
         "Herr Klein has henchmen in Berlin: Köbes, drivers, the little glasses who did the dirty work in the warehouse. Tobi books them all a trip. Berlin to Cologne. Regional trains only, change in Magdeburg, Hannover, Hamm and Hagen, never more than four minutes to make a connection.",
-        "Then he puts each ticket in an envelope with an order, in the smallest, most upright handwriting he can manage: <em>Report to Cologne at once. Take exactly this train. K.</em> A Köbes never asks. He just follows orders.",
+        "Then he puts each ticket in an envelope with an order, in the smallest, most upright handwriting he can manage: <em>Report to Cologne at once. Take exactly this train. Herr Klein, 0,2 l</em> A Köbes never asks. He just follows orders.",
         "They board this morning.",
         "They are never heard from again.",
         "A one-way ticket to nowhere. Also known as a Regionalbahn.",
@@ -698,7 +698,7 @@ window.HEIST = {
         "A Spirit like that is the rarest thing there is. And it's exactly what a small, cold, empty glass would want most, and could never have.",
         "And word comes from Cologne. At Herr Klein's big Anstich, the barrel was tapped in front of everyone. Out came Düsseldorf Altbier. On Christmas. In Cologne. The video is already going round the family chat.",
         "Herr Klein himself, filled to the brim with Christmas Altbier, feels full for the first time in his life. He's quieter now. Almost content. He stays in Cologne, where he belongs.",
-        "Late that night, when the table finally goes quiet, a message arrives from Herr Becher. Three weeks of Kölsch, Altbier, Christmas Altbier and Bordbistro beer, he writes, are enough for any man. Maybe, after all this, it's time for something calmer. Something warm. Something you sip slowly, from a cup that is not a glass at all. He won't say more. He's a Becher, not a blabbermouth. But he has a feeling a new colleague is on the way.",
+        "Late that night, when the table finally goes quiet, a message arrives from Herr Becher. He got off at Düsseldorf Hbf yesterday, to spend Christmas in the Altstadt with old friends. He'll be back on the shelf in Berlin before you are. Three weeks of Kölsch, Altbier, Christmas Altbier and Bordbistro beer, he writes, are enough for any man. Maybe, after all this, it's time for something calmer. Something warm. Something you sip slowly, from a cup that is not a glass at all. He won't say more. He's a Becher, not a blabbermouth. But he has a feeling a new colleague is on the way.",
         "And because a Spirit needs somewhere warm to wait for next year, it settles into the one thing that is always there at Christmas, every single year, without fail: the socks Nikolaus brought.",
         "It's not Christmas without socks.",
         "The Spirit has found its sole mates."
@@ -712,7 +712,7 @@ window.HEIST = {
         "And word comes from Cologne. At the big Anstich, everyone waited. The band played. The crowd sang. Somebody checked his watch. The barrel never came.",
         "Because the Deutsche Bahn, it turns out, never really worked for Herr Klein. It worked for whoever kept the Christmas Spirit locked up. And now nobody does: the Spirit is free, and so is the Bahn. Not good, exactly. Still late, still sorry for nothing. But back to being nobody's but its own.",
         "And somewhere in Köln Hbf, Herr Klein is still on platform 4, waiting for his connection to the Anstich. The departure board says <em>+40 min</em>. Then <em>+90</em>. Then <em>fällt aus</em>. The Deutsche Bahn regrets the inconvenience. Nobody else does.",
-        "Late that night, when the table finally goes quiet, a message arrives from Herr Becher. Three weeks of Kölsch, Altbier, Christmas Altbier and Bordbistro beer, he writes, are enough for any man. Maybe, after all this, it's time for something calmer. Something warm. Something you sip slowly, from a cup that is not a glass at all. He won't say more. He's a Becher, not a blabbermouth. But he has a feeling a new colleague is on the way.",
+        "Late that night, when the table finally goes quiet, a message arrives from Herr Becher. He got off at Düsseldorf Hbf yesterday, to spend Christmas in the Altstadt with old friends. He'll be back on the shelf in Berlin before you are. Three weeks of Kölsch, Altbier, Christmas Altbier and Bordbistro beer, he writes, are enough for any man. Maybe, after all this, it's time for something calmer. Something warm. Something you sip slowly, from a cup that is not a glass at all. He won't say more. He's a Becher, not a blabbermouth. But he has a feeling a new colleague is on the way.",
         "And because a Spirit needs somewhere warm to wait for next year, it settles into the one thing that is always there at Christmas, every single year, without fail: the socks Nikolaus brought.",
         "It's not Christmas without socks.",
         "The Spirit has found its sole mates."
