@@ -1,4 +1,4 @@
-// The Great Christmas Heist: the full story, as Tobi reads it.
+// The Great Christmas Geist Heist: the full story, as Tobi reads it.
 // Day N opens on N December. Version key = the choice made the day before
 // (day 2 uses prologue + day-1 choice, e.g. "A-B").
 // Fields: p (paragraphs), widget, gate {q, a[], hint}, after (shown once the gate is solved), choices [A, B].
@@ -8,7 +8,7 @@ window.HEIST = {
   days: {
 
     0: { date: 1, versions: { X: {
-      title: "The Great Christmas Heist", kicker: "Prologue",
+      title: "The Great Christmas Geist Heist", kicker: "Prologue",
       p: [
         "Every year, shortly before Christmas, a train leaves Berlin heading west. On board: two people, three languages, one bag of presents and a quiet, well-founded certainty that the Deutsche Bahn will find a way to ruin it. The destination is Aachen, the only city in Germany that God actually finished, and from there Roetgen, on the edge of the Eifel, where Tobi's family has done Christmas the same way since before anyone thought to question it. Four siblings, their families, two parents, one dining table. They eat until salad becomes a fantasy. They drink until someone brings up politics, and then they drink faster. Nobody goes to bed before 3 a.m., because whoever leaves first becomes the next topic.",
         "Nobody can say exactly what makes it work. In German they call it <em>Weihnachtsgeist</em>, and Geist is also what you call a raspberry schnapps. In Polish, spirit is <em>spirytus</em>, which is 95% alcohol. In English it's simply the Christmas Spirit. Three languages, one conclusion: this family's Christmas has always been at least partly flammable.",

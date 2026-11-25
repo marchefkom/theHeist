@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>The Great Christmas Heist</title>
+<title>The Great Christmas Geist Heist</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#13211b">
 <link rel="icon" href="assets/icon-192.png">
@@ -250,7 +250,7 @@ function renderHome() {
   else if (doorDone(24)) lead = "Case closed. Until next year.";
   else lead = "That's everything for today. The next door opens tomorrow.";
   $("#home").innerHTML = `
-    <h1 class="title">The Great <span>Christmas Heist</span></h1>
+    <h1 class="title">The Great <span>Christmas Geist Heist</span></h1>
     <p class="sub">${lead}</p>
     <div class="doors">${doors}</div>
     <div class="cta">${nd ? `<button class="btn" id="opennext">Open ${nd} December</button>` : ""}${installEvt ? `<button class="btn ghost" id="install">Install the case files</button>` : ""}</div>
