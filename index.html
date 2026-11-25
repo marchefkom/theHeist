@@ -258,7 +258,7 @@ function renderHome() {
     ${caseCode() ? `<p class="note" style="margin-top:28px">Case file <b style="letter-spacing:.08em">${fmtCode(caseCode())}</b>. Keep it: if your progress ever goes missing, this brings it back.</p>` : ""}
     <div style="margin-top:${caseCode() ? 8 : 28}px"><button class="linkbtn" id="haveCode">${caseCode() ? "Restore a different case file" : "Lost your progress? Enter your case file"}</button></div>
     <div id="codeBox" class="${!caseCode() && !WALKTHROUGH && realToday() > 1 ? "" : "hidden"}" style="margin-top:10px"><div class="ask"><input id="codeIn" placeholder="AABA-BBAB" autocomplete="off" aria-label="Case file"><button class="btn" id="codeGo">Restore</button></div><div class="msg" id="codeMsg"></div></div>
-    ${WALKTHROUGH && (S.picks[0] || doorDone(24)) ? `<button class="linkbtn restart" id="restart">Start over from 1 December</button>` : ""}`;
+    ${S.picks[0] || doorDone(24) ? `<button class="linkbtn restart" id="restart">Start over from the beginning</button>` : ""}`;
   document.querySelectorAll(".door").forEach(b => b.onclick = () => { const d = +b.dataset.d; if (doorOpen(d)) go(doorTarget(d)); });
   const on = $("#opennext"); if (on) on.onclick = () => go(doorTarget(nd));
   $("#haveCode").onclick = () => { $("#codeBox").classList.toggle("hidden"); $("#codeIn").focus(); };
